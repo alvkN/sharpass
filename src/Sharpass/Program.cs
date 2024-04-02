@@ -32,7 +32,7 @@ static Command GetRootCommand()
     var passwordsCountOption = new Option<int>(
         aliases: ["--count", "-c"],
         description: "Count of passwords to generate",
-        getDefaultValue: () => 1000000);
+        getDefaultValue: () => 1);
 
     rootCommand.AddOption(useRussianLettersOption);
     rootCommand.AddOption(passwordLengthOption);
