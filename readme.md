@@ -21,4 +21,4 @@ This thing is fully opinionated, there are no specifications/recommendations/etc
 - You can get more detailed list without jokes by using `sharpass --help`
 
 ### Build
-Instal dotnet SDK v8 and run `dotnet publish -c Release -r <RID>` where RID is short for Runtime IDentifier ([you can obtain one here](https://learn.microsoft.com/en-us/dotnet/core/rid-catalog#known-rids)). Probably, you need `win-x64` or `linux-x64`. 
+Install dotnet SDK v8 and run `dotnet publish -c Release -r <RID>` where RID is short for Runtime IDentifier ([you can obtain one here](https://learn.microsoft.com/en-us/dotnet/core/rid-catalog#known-rids)). Probably, you need `win-x64` or `linux-x64`. 
