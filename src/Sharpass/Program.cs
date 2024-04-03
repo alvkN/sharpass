@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using System.CommandLine.Parsing;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Sharpass;
@@ -26,13 +27,15 @@ static Command GetRootCommand()
 
     var passwordLengthOption = new Option<int>(
         aliases: ["--length", "-l"],
-        description: "Length of generated password",
-        getDefaultValue: () => 16);
+        isDefault: true,
+        parseArgument: result => ParsePositiveInteger(result, 16),
+        description: "Length of generated password");
 
     var passwordsCountOption = new Option<int>(
         aliases: ["--count", "-c"],
-        description: "Count of passwords to generate",
-        getDefaultValue: () => 1);
+        isDefault: true,
+        parseArgument: result => ParsePositiveInteger(result, 1),
+        description: "Count of passwords to generate");
 
     rootCommand.AddOption(useRussianLettersOption);
     rootCommand.AddOption(passwordLengthOption);
@@ -42,7 +45,7 @@ static Command GetRootCommand()
     {
         var lowerLetters = useRussian ? lowerLettersRussian : lowerLettersEnglish;
         var upperLetters = useRussian ? upperLettersRussian : upperLettersEnglish;
-        
+
         for (var i = 0; i < passwordsCount; i++)
         {
             Console.WriteLine(GeneratePassword(lowerLetters, upperLetters, passwordLength));
@@ -64,7 +67,7 @@ static string GeneratePassword(string lowerLettersDictionary, string upperLetter
     var unshuffledPasswordSpan = string.Concat(lowerLetters, upperLetters, digits, specialChars)
         .AsSpan()
         .ToReadWriteSpan();
-    
+
     RandomNumberGenerator.Shuffle(unshuffledPasswordSpan);
 
     return unshuffledPasswordSpan.ToString();
@@ -74,16 +77,16 @@ static CharOccurrences CalculateCharOccurrences(int passwordLength)
 {
     var allLettersPercent = RandomNumberGenerator.GetInt32(60, 80 + 1).ToPercent();
     var allLettersCount = (allLettersPercent * passwordLength).RoundAwayFromZero();
-    
+
     var lowerLettersPercent = RandomNumberGenerator.GetInt32(60, 70 + 1).ToPercent() * allLettersPercent;
     var lowerLettersCount = (lowerLettersPercent * passwordLength).RoundAwayFromZero();
-    
+
     var nonLettersPercent = 1 - allLettersPercent;
     var nonLettersCount = passwordLength - allLettersCount;
 
     var digitsPercent = RandomNumberGenerator.GetInt32(60, 80 + 1).ToPercent() * nonLettersPercent;
     var digitsCount = (digitsPercent * passwordLength).RoundAwayFromZero();
-    
+
     var upperLettersCount = allLettersCount - lowerLettersCount;
     var specialCharsCount = nonLettersCount - digitsCount;
 
@@ -94,4 +97,22 @@ static CharOccurrences CalculateCharOccurrences(int passwordLength)
 static Span<char> GetRandomCharSpan(string choices, int count)
 {
     return RandomNumberGenerator.GetItems(choices.AsSpan(), count).AsSpan();
+}
+
+
+static int ParsePositiveInteger(ArgumentResult result, int defaultValue)
+{
+    if (result.Tokens.Count == 0)
+    {
+        return defaultValue;
+    }
+
+    var isParsed = int.TryParse(result.Tokens.Single().Value, out var intValue);
+    if (!isParsed || intValue is <= 0 or > 10000)
+    {
+        result.ErrorMessage = $"Parameter \"{result.Argument.Name}\" must be an integer between 1 and 10000";
+        return defaultValue;
+    }
+
+    return intValue;
 }
