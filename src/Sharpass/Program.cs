@@ -99,7 +99,6 @@ static Span<char> GetRandomCharSpan(string choices, int count)
     return RandomNumberGenerator.GetItems(choices.AsSpan(), count).AsSpan();
 }
 
-
 static int ParsePositiveInteger(ArgumentResult result, int defaultValue)
 {
     if (result.Tokens.Count == 0)
